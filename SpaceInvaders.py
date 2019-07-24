@@ -1,6 +1,7 @@
 # Ctrl + Shift + P, then select interpreter
 # Choose an interpreter that works
 import pygame
+from hero import Hero
 
 # Game settings
 WINDOW_WIDTH = 400
@@ -15,6 +16,7 @@ GAME_RIGHT_WALL = WINDOW_WIDTH - GAME_SIDE_MARGIN - GAME_BORDER_WIDTH
 GAME_BOTTOM_WALL = WINDOW_HEIGHT - GAME_BOTTOM_MARGIN - GAME_BORDER_WIDTH
 GAME_LEFT_WALL = GAME_SIDE_MARGIN + GAME_BORDER_WIDTH
 
+# Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
@@ -28,14 +30,12 @@ score_font = pygame.font.SysFont('Arial', 22, True)
 title_font = pygame.font.SysFont('Arial', 26, True)
 pygame.display.set_caption('SPACE INVADERS!')
 
-x_coordinate = 200
-y_coordinate = GAME_BOTTOM_WALL - player_image.get_height()
 should_move_right = False
 should_move_left = False
 
 
 def handle_events():
-    global x_coordinate, y_coordinate, is_playing, should_move_left, should_move_right
+    global is_playing, should_move_left, should_move_right
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             is_playing = False
@@ -53,16 +53,21 @@ def handle_events():
                     should_move_right = False
 
 
+hero = Hero(player_image, 200, GAME_BOTTOM_WALL - player_image.get_height())
+
 # Main Game Loop
 is_playing = True
 while is_playing:
 
     handle_events()
 
-    if should_move_right:
-        x_coordinate += 10
-    elif should_move_left:
-        x_coordinate -= 10
+    if hero.has_collided_with_left_wall(GAME_LEFT_WALL) == False:
+        if should_move_left:
+            hero.xcor -= 10
+
+    if hero.has_collided_with_right_wall(GAME_RIGHT_WALL) == False:
+        if should_move_right:
+            hero.xcor += 10
 
     game_display.blit(game_display, (0, 0))
 
@@ -78,7 +83,7 @@ while is_playing:
                       WINDOW_WIDTH - GAME_LEFT_WALL - GAME_SIDE_MARGIN - GAME_BORDER_WIDTH,
                       WINDOW_HEIGHT - GAME_TOP_WALL - GAME_BOTTOM_MARGIN - GAME_BORDER_WIDTH))
 
-    game_display.blit(player_image, (x_coordinate, y_coordinate))
+    hero.show(game_display)
     # score_text = score_font.render(str(snake.score), False, WHITE)
     # game_display.blit(score_text, (0,0))
 
