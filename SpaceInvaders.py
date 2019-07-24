@@ -14,18 +14,27 @@ pygame.display.set_caption('SPACE INVADERS!')
 
 x_coordinate = 200
 y_coordinate = 575
+should_move_right = False
+should_move_left = False
 
 
 def handle_events():
-    global x_coordinate, y_coordinate, is_playing
+    global x_coordinate, y_coordinate, is_playing, should_move_left, should_move_right
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             is_playing = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                x_coordinate -= 10
+                should_move_left = True
+                should_move_right = False
             elif event.key == pygame.K_RIGHT:
-                x_coordinate += 10
+                should_move_right = True
+                should_move_left = False
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT:
+                    should_move_left = False
+                if event.key == pygame.K_RIGHT:
+                    should_move_right = False
 
 
 # Main Game Loop
@@ -33,6 +42,11 @@ is_playing = True
 while is_playing:
 
     handle_events()
+
+    if should_move_right:
+        x_coordinate += 10
+    elif should_move_left:
+        x_coordinate -= 10
 
     game_display.blit(game_display, (0, 0))
 
