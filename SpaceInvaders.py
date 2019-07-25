@@ -65,6 +65,11 @@ enemies = []
 enemies.append(Enemy(enemy_image, 25, 25))
 enemies.append(Enemy(enemy_image, 50, 25))
 enemies.append(Enemy(enemy_image, 75, 25))
+enemies.append(Enemy(enemy_image, 100, 25))
+enemies.append(Enemy(enemy_image, 25, 50))
+enemies.append(Enemy(enemy_image, 50, 50))
+enemies.append(Enemy(enemy_image, 75, 50))
+enemies.append(Enemy(enemy_image, 100, 50))
 
 # Main Game Loop
 is_playing = True
@@ -80,14 +85,20 @@ while is_playing:
         if should_move_right:
             hero.xcor += 10
 
+    # Move each enemy down and change its direction if it's hit a wall
     for i in range(0, len(enemies), 1):
         if enemies[i].has_collided_with_left_wall(GAME_LEFT_WALL):
-            enemies[i].ycor += 10
-            enemies[i].direction = 1
+            for k in range(0, len(enemies)):
+                enemies[k].ycor += 10
+                enemies[k].direction = 1
+            break
         if enemies[i].has_collided_with_right_wall(GAME_RIGHT_WALL):
-            enemies[i].ycor += 10
-            enemies[i].direction = -1
+            for k in range(0, len(enemies), 1):
+                enemies[k].ycor += 10
+                enemies[k].direction = -1
+            break
 
+    # Move each enemy over based on its direction
     for i in range(0, len(enemies), 1):
         enemies[i].xcor += 10 * enemies[i].direction
 
