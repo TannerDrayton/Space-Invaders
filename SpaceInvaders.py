@@ -50,11 +50,11 @@ def handle_events():
                 should_move_left = False
             elif event.key == pygame.K_SPACE:
                 hero.shoot(bullet_image)
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
-                    should_move_left = False
-                elif event.key == pygame.K_RIGHT:
-                    should_move_right = False
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                should_move_left = False
+            elif event.key == pygame.K_RIGHT:
+                should_move_right = False
 
 
 hero = Hero(player_image, 200, GAME_BOTTOM_WALL - player_image.get_height())
