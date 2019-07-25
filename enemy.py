@@ -5,6 +5,7 @@ class Enemy():
         self.img = image
         self.xcor = x_coordinate
         self.ycor = y_coordinate
+        self.direction = 1
         self.width = image.get_width()
 
     def show(self, game_display):
