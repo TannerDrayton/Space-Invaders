@@ -4,6 +4,7 @@ import pygame
 from hero import Hero
 from enemy import Enemy
 from fleet import Fleet
+from game_object import Game_Object
 
 # Game settings
 WINDOW_WIDTH = 400
@@ -22,12 +23,14 @@ GAME_LEFT_WALL = GAME_SIDE_MARGIN + GAME_BORDER_WIDTH
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+pygame.init()
 # Media files
 player_image = pygame.image.load('media/si-player.gif')
 bullet_image = pygame.image.load('media/si-bullet.gif')
 enemy_image = pygame.image.load('media/si-enemy.gif')
+laser_sound = pygame.mixer.Sound('media/si-laser.wav')
+explosion_sound = pygame.mixer.Sound('media/si-explode.wav')
 
-pygame.init()
 clock = pygame.time.Clock()
 game_display = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 score_font = pygame.font.SysFont('Arial', 22, True)
@@ -45,7 +48,10 @@ def handle_events():
             elif event.key == pygame.K_RIGHT:
                 hero.set_direction_right()
             elif event.key == pygame.K_SPACE:
+                laser_sound.play()
                 hero.shoot(bullet_image)
+            elif event.key == pygame.K_p:
+                pause_game()
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 hero.set_direction_none()
@@ -66,6 +72,18 @@ def show_background():
                       WINDOW_HEIGHT - GAME_TOP_WALL - GAME_BOTTOM_MARGIN - GAME_BORDER_WIDTH))
 
 
+def pause_game():
+    is_paused = True
+    while is_paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                is_paused = False
+                hero.is_alive = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    is_paused = False
+
+
 hero = Hero(player_image, 200, GAME_BOTTOM_WALL - player_image.get_height())
 
 fleet = Fleet(3, 5, 4, enemy_image, GAME_LEFT_WALL + 1, GAME_TOP_WALL + 1)
@@ -78,6 +96,15 @@ while hero.is_alive:
     fleet.handle_wall_collision(GAME_LEFT_WALL, GAME_RIGHT_WALL)
     hero.handle_wall_collision_for_bullets(GAME_TOP_WALL)
 
+    for bullet in hero.bullets_fired:
+        for ship in fleet.ships:
+            if bullet.has_collided_with(ship):
+                bullet.is_alive = False
+                ship.is_alive = False
+                explosion_sound.play()
+
+    fleet.remove_dead_ships()
+
     hero.move_all_bullets()
     hero.move(GAME_LEFT_WALL, GAME_RIGHT_WALL)
     fleet.move_over(GAME_LEFT_WALL, GAME_RIGHT_WALL)
@@ -85,7 +112,7 @@ while hero.is_alive:
     show_background()
     hero.show(game_display)
     fleet.show(game_display)
-    hero.show_all_bullets()
+    hero.show_all_bullets(game_display)
 
     # score_text = score_font.render(str(snake.score), False, WHITE)
     # game_display.blit(score_text, (0,0))
