@@ -53,6 +53,19 @@ def handle_events():
                 hero.set_direction_none()
 
 
+def show_background():
+    game_display.blit(game_display, (0, 0))
+    game_display.fill(BLACK)
+    pygame.draw.rect(game_display, WHITE,
+                     (GAME_SIDE_MARGIN, GAME_TOP_MARGIN,
+                      WINDOW_WIDTH - GAME_SIDE_MARGIN * 2,
+                      WINDOW_HEIGHT - GAME_BOTTOM_MARGIN * 2))
+    pygame.draw.rect(game_display, BLACK,
+                     (GAME_LEFT_WALL, GAME_TOP_WALL,
+                      WINDOW_WIDTH - GAME_LEFT_WALL - GAME_SIDE_MARGIN - GAME_BORDER_WIDTH,
+                      WINDOW_HEIGHT - GAME_TOP_WALL - GAME_BOTTOM_MARGIN - GAME_BORDER_WIDTH))
+
+
 hero = Hero(player_image, 200, GAME_BOTTOM_WALL - player_image.get_height())
 
 fleet = Fleet(3, 5, 4, enemy_image, GAME_LEFT_WALL + 1, GAME_TOP_WALL + 1)
@@ -62,38 +75,17 @@ while hero.is_alive:
 
     handle_events()
 
-    hero.move(GAME_LEFT_WALL, GAME_RIGHT_WALL)
-
     fleet.handle_wall_collision(GAME_LEFT_WALL, GAME_RIGHT_WALL)
+    hero.handle_wall_collision_for_bullets(GAME_TOP_WALL)
 
+    hero.move_all_bullets()
+    hero.move(GAME_LEFT_WALL, GAME_RIGHT_WALL)
     fleet.move_over(GAME_LEFT_WALL, GAME_RIGHT_WALL)
 
-    game_display.blit(game_display, (0, 0))
-
-    game_display.fill(BLACK)
-
-    pygame.draw.rect(game_display, WHITE,
-                     (GAME_SIDE_MARGIN, GAME_TOP_MARGIN,
-                      WINDOW_WIDTH - GAME_SIDE_MARGIN * 2,
-                      WINDOW_HEIGHT - GAME_BOTTOM_MARGIN * 2))
-
-    pygame.draw.rect(game_display, BLACK,
-                     (GAME_LEFT_WALL, GAME_TOP_WALL,
-                      WINDOW_WIDTH - GAME_LEFT_WALL - GAME_SIDE_MARGIN - GAME_BORDER_WIDTH,
-                      WINDOW_HEIGHT - GAME_TOP_WALL - GAME_BOTTOM_MARGIN - GAME_BORDER_WIDTH))
-
+    show_background()
     hero.show(game_display)
     fleet.show(game_display)
-
-    for bullet in hero.bullets_fired:
-        if bullet.has_collided_with_top_wall(GAME_TOP_WALL):
-            bullet.is_alive = False
-
-    hero.remove_dead_bullets()
-
-    for bullet in hero.bullets_fired:
-        bullet.move()
-        bullet.show(game_display)
+    hero.show_all_bullets()
 
     # score_text = score_font.render(str(snake.score), False, WHITE)
     # game_display.blit(score_text, (0,0))
